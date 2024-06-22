@@ -15,13 +15,10 @@ const mongoURI = process.env.MONGO_URI;
 let db; // MongoDB connection reference
 
 // Connect to MongoDB
-mongodb.MongoClient.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongodb.MongoClient.connect(mongoURI)
 .then(client => {
   console.log('MongoDB connected');
-  db = client.db(); // Assign database reference to 'db' variable
+  db = client.db("library_management_system"); // Assign database reference to 'db' variable
 })
 .catch(err => {
   console.error('MongoDB connection error:', err);
