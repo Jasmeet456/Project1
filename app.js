@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const mongodb = require('mongodb');
 const methodOverride = require("method-override");
+const { error } = require('console');
 require('dotenv').config();
 
 
@@ -29,7 +30,15 @@ mongodb.MongoClient.connect(mongoURI)
 });
 
 app.get('/',(req,res)=>{
-        res.send("Hello World");
+        res.send("Hello World!");
+});
+
+app.get("/books", (req, res) => {
+  db.collection("books").find().toArray()
+  .then(books => {
+    res.render("index", {books});
+  })
+  .catch(err => res.status(500).json({error: "An error occured while retrieving book", detail: err}));
 });
 
 app.get("/books/new", (req, res) => {
