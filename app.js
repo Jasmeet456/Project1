@@ -53,10 +53,57 @@ app.post("/books", (req, res) => {
   };
 
   db.collection("books").insertOne(book)
-  .then(result => res.send(result))
+  .then(result => res.redirect("/books"))
   .catch(err => res.status(500).json({error: "An error occured while inserting book", detail: err}));
 });
 
+app.get("/books/:id/edit", (req, res) => {
+  const { id } = req.params;
+  const objectID = new mongodb.ObjectId(id);
+  
+  db.collection("books").findOne({ _id: mongodb.ObjectId })
+  .then(book => {
+    if(!book){
+      return res.status(404).json({error: "Book not found.", detail: err});
+    }
+    res.render("edit_book", {book});
+  })
+  .catch(err => res.status(500).json({error: "An error occured while retrieving book", detail: err}));
+});
+
+app.put("/books/:id", (req, res) => {
+  const { id } = req.params;
+  const objectID = new mongodb.ObjectId(id);
+
+  const updateBook = {
+    title: req.body.title,
+    author: req.body.author,
+    publishedDate: new Date(req.body.publishedDate)
+  };
+
+  db.collection("books").updateOne({ _id: objectID }, { $set: updateBook })
+  .then(result => {
+    if(result.matchedCount === 0) {
+      return res.status(404).json({error: "Book not found.", detail: err});
+    }
+    res.redirect("/books");
+  })
+  .catch(err => res.status(500).json({error:"An error occured while updating book", detail: err}));
+  });
+
+  app.delete("/books/:id", (req, res) => {
+  const { id } = req.parms;
+  const objectID = new mongodb.ObjectID(id);
+
+  db.collection("books").deleteOne({ _id: objectID })
+  .then(result => {
+    if(result.deleteOne === 0) {
+      return res.status(404).json({error: "Book not found." ,detail: err});
+    }
+    res.redirect("/books");
+  })
+  .catch(err => res.status(500).json({error: "An error occured while deleting book", detail: err}));
+  });
 app.listen(port, ()=>{
        console.log(`Server started at http://localhost:${port} `);
 });
